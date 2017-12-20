@@ -38,6 +38,11 @@
 		android:layout_alignParentRight="true"
 		android:layout_alignParentEnd="true">
 		<Button
+			android:id="@+id/erase"
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:layout_margin="8dp"/>
+		<Button
 			android:id="@+id/stroke"
 			android:layout_width="32dp"
 			android:layout_height="32dp"
@@ -70,6 +75,14 @@
 				android:layout_height="wrap_content"
 				tools:background="#fff"
 				android:background="#f00"/>
+			<picturedraweditor.inlacou.bvapps.com.picturedraweditor.CanvasView
+				android:id="@+id/canvas"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignTop="@+id/image"
+				android:layout_alignBottom="@+id/image"
+				android:layout_alignStart="@+id/image"
+				android:layout_alignEnd="@+id/image"/>
 		</RelativeLayout>
 	</colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout>
 </RelativeLayout>

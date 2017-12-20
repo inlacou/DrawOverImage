@@ -13,6 +13,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Button
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
@@ -33,6 +34,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	lateinit private var imageView: ImageView
 	lateinit private var colorPickLayout: ColorPickLayout
 	lateinit private var color: Button
+	lateinit private var erase: Button
+	lateinit private var canvas: CanvasView
 
 	companion object {
 
@@ -70,8 +73,11 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	private fun initialize(savedInstanceState: Bundle?) {
 		imageView = findViewById(R.id.image)
 		colorPickLayout = findViewById(R.id.colorPickLayout)
+		canvas = findViewById(R.id.canvas)
 		color = findViewById(R.id.color)
+		erase = findViewById(R.id.erase)
 		controller = PictureDrawEditorCtrl(view = this, model = model)
+		canvas.setModel(model)
 	}
 
 	private fun populate() {
@@ -94,28 +100,45 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 		try {
 			val inputStream = FileInputStream(model.filePath)
-			model.bitmap = BitmapFactory.decodeStream(inputStream)
+			model.layer0 = BitmapFactory.decodeStream(inputStream)
 			//selectedImage = ImageUtils.scaleBitmapKeepAspectRatio(bitmap, size)
 			inputStream.close()
 		} catch (e: FileNotFoundException) {
-			model.bitmap = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(model.filePath))
+			model.layer0 = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(model.filePath))
 		} catch (e: IOException) {
 			e.printStackTrace()
 		}
 
-		if (model.bitmap == null) {
+		if (model.layer0 == null) {
 			return
 		}
 		imageView.adjustViewBounds = true
 		imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-		val drawable = BitmapDrawable(resources, model.bitmap)
+		val drawable = BitmapDrawable(resources, model.layer0)
 		imageView.setImageDrawable(drawable)
 	}
 
 	private fun setListeners() {
+		color.setOnClickListener {
+			if(model.mode==Mode.draw){
+				model.mode = Mode.pick
+			}else{
+				model.mode = Mode.draw
+			}
+			canvas.update()
+		}
+		erase.setOnClickListener {
+			if(model.mode==Mode.erase){
+				model.mode = Mode.draw
+			}else{
+				model.mode = Mode.erase
+			}
+			canvas.update()
+		}
 		colorPickLayout.setSelector(object: ColorListener{
 			override fun onColorSelected(envelope: ColorWrapper) {
 				color.background = ColorDrawable(envelope.color)
+				model.color = envelope.color
 			}
 		})
 	}
