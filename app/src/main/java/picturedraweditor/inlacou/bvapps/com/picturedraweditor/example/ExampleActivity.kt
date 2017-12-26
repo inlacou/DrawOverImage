@@ -28,7 +28,7 @@ class ExampleActivity : AppCompatActivity() {
 				request_code_select_picture = REQUEST_CODE_SELECT_PICTURE, request_code_crop = REQUEST_CODE_CROP,
 				callbacks = getImageGetterCallback())
 
-		findViewById<Button>(R.id.startButton).setOnClickListener({ imageGetter?.start("") })
+		findViewById<Button>(R.id.startButton).setOnClickListener({ imageGetter!!.start("") })
 	}
 
 	private fun getImageGetterCallback(): ImageGetter.Callbacks {

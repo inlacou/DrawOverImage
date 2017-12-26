@@ -1,5 +1,6 @@
 package picturedraweditor.inlacou.bvapps.com.picturedraweditor
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -12,22 +13,28 @@ import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Button
+import android.widget.TextView
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorWrapper
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.security.Permission
 
 
 /**
  * Created by inlacou on 19/12/17.
  */
 class PictureDrawEditorAct : AppCompatActivity() {
+
+	private val requestCode = 1
+
 	lateinit private var model: PictureDrawEditorMdl
 	lateinit private var controller: PictureDrawEditorCtrl
 
@@ -35,6 +42,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	lateinit private var colorPickLayout: ColorPickLayout
 	lateinit private var color: Button
 	lateinit private var erase: Button
+	lateinit private var btnAccept: TextView
+	lateinit private var btnCancel: TextView
 	lateinit private var canvas: CanvasView
 
 	companion object {
@@ -76,6 +85,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		canvas = findViewById(R.id.canvas)
 		color = findViewById(R.id.color)
 		erase = findViewById(R.id.erase)
+		btnAccept = findViewById(R.id.btnAccept)
+		btnCancel = findViewById(R.id.btnCancel)
 		controller = PictureDrawEditorCtrl(view = this, model = model)
 		canvas.setModel(model)
 	}
@@ -134,6 +145,9 @@ class PictureDrawEditorAct : AppCompatActivity() {
 				model.mode = Mode.erase
 			}
 			canvas.update()
+		}
+		btnAccept.setOnClickListener{
+			canvas.saveImage()
 		}
 		colorPickLayout.setSelector(object: ColorListener{
 			override fun onColorSelected(envelope: ColorWrapper) {

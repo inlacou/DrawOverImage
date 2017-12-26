@@ -9,13 +9,15 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by inlacou on 20/12/17.
@@ -70,7 +72,7 @@ public class CanvasView extends View {
 	public CanvasView(Context c, AttributeSet attrs) {
 		super(c, attrs);
 		context = c;
-
+		this.setDrawingCacheEnabled(true);
 		setLayerType(LAYER_TYPE_HARDWARE, null);
 		update();
 	}
@@ -79,15 +81,15 @@ public class CanvasView extends View {
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		Log.d(DEBUG_TAG, "onSizeChanged");
+		Log.d(DEBUG_TAG, "onSizeChanged " + w + ", " + h);
 
-		updateBitmap(w, h);
+		updateBitmap(5312, 2988);
 	}
 
 	private void updateBitmap(int w, int h) {
 		// your Canvas will draw onto the defined Bitmap
-		mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-		mCanvas = new Canvas(mBitmap);
+		if(mBitmap==null) mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		if(mCanvas==null) mCanvas = new Canvas(mBitmap);
 	}
 
 	public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
@@ -98,6 +100,30 @@ public class CanvasView extends View {
 		canvas.drawBitmap(bmp1, new Matrix(), null);
 		canvas.drawBitmap(bmp2, 0,0, null);
 		return bmOverlay;
+	}
+
+	public void saveImage() {
+		for (int i=0; i<paths.size(); i++){
+			mCanvas.drawPath(paths.get(i), paints.get(i));
+		}
+		mCanvas.drawPath(currentPath, currentPaint);
+		String root = Environment.getExternalStorageDirectory().toString();
+		File myDir = new File(root);
+		myDir.mkdirs();
+		String fname = "Image-" + System.currentTimeMillis() + ".jpg";
+		File file = new File(myDir, fname);
+		if (file.exists()) file.delete();
+		Log.i("LOAD", file.getAbsolutePath());
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			//overlay(model.getLayer0(), mBitmap).compress(Bitmap.CompressFormat.JPEG, 90, out);
+			//mCanvas.drawBitmap(mBitmap, 0, 0, null);
+			mBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// override onDraw
