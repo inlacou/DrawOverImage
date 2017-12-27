@@ -13,20 +13,15 @@ import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.Button
-import android.widget.TextView
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorWrapper
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.security.Permission
-
 
 /**
  * Created by inlacou on 19/12/17.
@@ -40,10 +35,14 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	lateinit private var imageView: ImageView
 	lateinit private var colorPickLayout: ColorPickLayout
-	lateinit private var color: Button
-	lateinit private var erase: Button
-	lateinit private var btnAccept: TextView
-	lateinit private var btnCancel: TextView
+	lateinit private var btnColor: View
+	lateinit private var btnUndo: View
+	lateinit private var btnRedo: View
+	lateinit private var btnErase: View
+	lateinit private var btnAccept: View
+	lateinit private var btnCancel: View
+	lateinit private var colorDisplay: CircleView
+	lateinit private var brushColorDisplay: ImageView
 	lateinit private var canvas: CanvasView
 
 	companion object {
@@ -83,8 +82,12 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		imageView = findViewById(R.id.image)
 		colorPickLayout = findViewById(R.id.colorPickLayout)
 		canvas = findViewById(R.id.canvas)
-		color = findViewById(R.id.color)
-		erase = findViewById(R.id.erase)
+		colorDisplay = findViewById(R.id.color_display)
+		brushColorDisplay = findViewById(R.id.brush_color_display)
+		btnColor = findViewById(R.id.color)
+		btnErase = findViewById(R.id.erase)
+		btnUndo = findViewById(R.id.undo)
+		btnRedo = findViewById(R.id.redo)
 		btnAccept = findViewById(R.id.btnAccept)
 		btnCancel = findViewById(R.id.btnCancel)
 		controller = PictureDrawEditorCtrl(view = this, model = model)
@@ -93,6 +96,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	private fun populate() {
 		Log.d(DEBUG_TAG, "model: $model")
+
+		colorDisplay.fillColor = model.color
 
 		//Utils.resizeView(imageView, -1, (size.y*0.5).toInt())
 		imageView.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener{
@@ -130,15 +135,17 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 
 	private fun setListeners() {
-		color.setOnClickListener {
+		btnColor.setOnClickListener {
 			if(model.mode==Mode.draw){
 				model.mode = Mode.pick
+				brushColorDisplay.setImageDrawable(resources.getDrawable(R.drawable.color_picker))
 			}else{
 				model.mode = Mode.draw
+				brushColorDisplay.setImageDrawable(resources.getDrawable(R.drawable.brush))
 			}
 			canvas.update()
 		}
-		erase.setOnClickListener {
+		btnErase.setOnClickListener {
 			if(model.mode==Mode.erase){
 				model.mode = Mode.draw
 			}else{
@@ -146,13 +153,24 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			}
 			canvas.update()
 		}
+		btnUndo.setOnClickListener {
+			canvas.undo()
+		}
+		btnRedo.setOnClickListener {
+			canvas.redo()
+		}
 		btnAccept.setOnClickListener{
 			canvas.saveImage()
 		}
+		btnCancel.setOnClickListener{
+			onBackPressed()
+		}
 		colorPickLayout.setSelector(object: ColorListener{
 			override fun onColorSelected(envelope: ColorWrapper) {
-				color.background = ColorDrawable(envelope.color)
-				model.color = envelope.color
+				if(model.mode==Mode.pick) {
+					model.color = envelope.color
+					colorDisplay.fillColor = model.color
+				}
 			}
 		})
 	}
