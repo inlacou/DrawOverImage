@@ -62,7 +62,8 @@ public class CanvasView extends View {
 			} else {
 				currentPaint.setColor(Color.BLACK);
 			}
-			//currentPaint.setAlpha(50);
+			//Set alpha to 0.7
+			currentPaint.setAlpha(180);
 		}
 		currentPaint.setStyle(Paint.Style.STROKE);
 		currentPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -81,28 +82,32 @@ public class CanvasView extends View {
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		Log.d(DEBUG_TAG, "onSizeChanged " + w + ", " + h);
+		Log.d(DEBUG_TAG+".onSizeChanged", "size:   " + w + ", " + h);
+		Log.d(DEBUG_TAG+".onSizeChanged", "layer0: " + model.getLayer0().getWidth() + ", " + model.getLayer0().getHeight());
 
-		updateBitmap(5312, 2988);
+		updateBitmap(w, h);
 	}
 
 	private void updateBitmap(int w, int h) {
 		// your Canvas will draw onto the defined Bitmap
-		if(mBitmap==null) mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-		if(mCanvas==null) mCanvas = new Canvas(mBitmap);
+		mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		mCanvas = new Canvas(mBitmap);
 	}
 
 	public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
 		Log.d(DEBUG_TAG+".overlay1", bmp1.getWidth() + ", " + bmp1.getHeight());
 		Log.d(DEBUG_TAG+".overlay2", bmp2.getWidth() + ", " + bmp2.getHeight());
 		Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+		Bitmap scaledBmp2 = Bitmap.createScaledBitmap(bmp2, bmp1.getWidth(), bmp1.getHeight(), false);
 		Canvas canvas = new Canvas(bmOverlay);
 		canvas.drawBitmap(bmp1, new Matrix(), null);
-		canvas.drawBitmap(bmp2, 0,0, null);
+		canvas.drawBitmap(scaledBmp2, 0, 0, null);
 		return bmOverlay;
 	}
 
 	public void saveImage() {
+		//Draw background into the canvas
+		//mCanvas.drawBitmap(model.getLayer0(), 0, 0, null);
 		for (int i=0; i<paths.size(); i++){
 			mCanvas.drawPath(paths.get(i), paints.get(i));
 		}
@@ -113,12 +118,9 @@ public class CanvasView extends View {
 		String fname = "Image-" + System.currentTimeMillis() + ".jpg";
 		File file = new File(myDir, fname);
 		if (file.exists()) file.delete();
-		Log.i("LOAD", file.getAbsolutePath());
 		try {
 			FileOutputStream out = new FileOutputStream(file);
-			//overlay(model.getLayer0(), mBitmap).compress(Bitmap.CompressFormat.JPEG, 90, out);
-			//mCanvas.drawBitmap(mBitmap, 0, 0, null);
-			mBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+			overlay(model.getLayer0(), mBitmap).compress(Bitmap.CompressFormat.PNG, 90, out);
 			out.flush();
 			out.close();
 		} catch (Exception e) {
@@ -130,7 +132,9 @@ public class CanvasView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		// draw the currentPath with the currentPaint on the canvas when onDraw
+		// Draw image into the canvas (it will be too big, and only top-left side will be renderized)
+		//canvas.drawBitmap(model.getLayer0(), 0, 0, null);
+		// Draw the currentPath with the currentPaint on the canvas when onDraw
 		for (int i=0; i<paths.size(); i++){
 			canvas.drawPath(paths.get(i), paints.get(i));
 		}
