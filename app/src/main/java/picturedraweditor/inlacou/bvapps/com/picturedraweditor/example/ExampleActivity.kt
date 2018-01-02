@@ -15,6 +15,7 @@ class ExampleActivity : AppCompatActivity() {
 
 	private val REQUEST_CODE_SELECT_PICTURE: Int = 0
 	private val REQUEST_CODE_CROP: Int = 1
+	private val REQUEST_CODE_EDIT: Int = 2
 
 	private var imageGetter: ImageGetter? = null
 
@@ -37,7 +38,7 @@ class ExampleActivity : AppCompatActivity() {
 				//Get image from path and do whatever you want with it.
 				//For example, load it into an imageView
 				Log.d("ExampleAct", "path: $path")
-				PictureDrawEditorAct.navigate(this@ExampleActivity, PictureDrawEditorMdl(path))
+				PictureDrawEditorAct.navigateForResult(this@ExampleActivity, REQUEST_CODE_EDIT, PictureDrawEditorMdl(path))
 			}
 		}
 	}

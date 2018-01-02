@@ -18,6 +18,7 @@ import android.view.View
 import java.io.File
 import java.io.FileOutputStream
 import java.util.ArrayList
+import kotlin.concurrent.thread
 
 /**
  * Created by inlacou on 20/12/17.
@@ -54,7 +55,9 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 		if (model != null && model!!.mode === Mode.erase) {
 			currentPaint.color = Color.TRANSPARENT
 			currentPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+			currentPaint.strokeWidth = model!!.eraserWidth.toPx.toFloat()
 		} else {
+			currentPaint.strokeWidth = model?.colorWidth?.toPx?.toFloat() ?: 15.toPx.toFloat()
 			if (model != null) {
 				currentPaint.color = model!!.color
 			} else {
@@ -65,7 +68,6 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 		}
 		currentPaint.style = Paint.Style.STROKE
 		currentPaint.strokeJoin = Paint.Join.ROUND
-		currentPaint.strokeWidth = 50f
 	}
 
 	init {
@@ -89,26 +91,31 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 		mCanvas = Canvas(mBitmap!!)
 	}
 
-	fun saveImage() {
+	fun saveImage(listener: FileSavedListener) {
+		Log.d(DEBUG_TAG+".saveImage", "start!")
 		//Draw background into the canvas
 		//mCanvas.drawBitmap(model.getLayer0(), 0, 0, null);
 		for (i in paths.indices) {
 			mCanvas!!.drawPath(paths[i], paints[i])
 		}
 		mCanvas!!.drawPath(currentPath, currentPaint)
-		val root = Environment.getExternalStorageDirectory().toString()
-		val myDir = File(root)
-		myDir.mkdirs()
-		val fname = "Image-" + System.currentTimeMillis() + ".jpg"
-		val file = File(myDir, fname)
-		if (file.exists()) file.delete()
-		try {
-			val out = FileOutputStream(file)
-			overlay(model!!.layer0, mBitmap).compress(Bitmap.CompressFormat.PNG, 90, out)
-			out.flush()
-			out.close()
-		} catch (e: Exception) {
-			e.printStackTrace()
+		thread(start = true) {
+			println("running from thread(): ${Thread.currentThread()}")
+			val root = Environment.getExternalStorageDirectory().toString()
+			val myDir = File(root)
+			myDir.mkdirs()
+			val fname = "Image-" + System.currentTimeMillis() + ".jpg"
+			val file = File(myDir, fname)
+			if (file.exists()) file.delete()
+			try {
+				val out = FileOutputStream(file)
+				overlay(model!!.layer0, mBitmap).compress(Bitmap.CompressFormat.PNG, 90, out)
+				out.flush()
+				out.close()
+			} catch (e: Exception) {
+				e.printStackTrace()
+			}
+			listener.onFileSaved(file)
 		}
 
 	}
@@ -155,20 +162,28 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 		invalidate()
 	}
 
-	fun undo() {
+	/**
+	 * @return true if more undos are possible
+	 */
+	fun undo(): Boolean {
 		try {
 			redoPaths.add(paths.removeAt(paths.size-1))
 			redoPaints.add(paints.removeAt(paints.size-1))
 			invalidate()
 		}catch (ioobe : IndexOutOfBoundsException){}
+		return redoPaths.size>0
 	}
 
-	fun redo() {
+	/**
+	 * @return true if more redos are possible
+	 */
+	fun redo(): Boolean {
 		try {
 			paths.add(redoPaths.removeAt(redoPaths.size - 1))
 			paints.add(redoPaints.removeAt(redoPaints.size - 1))
 			invalidate()
 		}catch (ioobe : IndexOutOfBoundsException){}
+		return paths.size>0
 	}
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -212,4 +227,9 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 			return bmOverlay
 		}
 	}
+
+	interface FileSavedListener{
+		fun onFileSaved(file: File)
+	}
+
 }

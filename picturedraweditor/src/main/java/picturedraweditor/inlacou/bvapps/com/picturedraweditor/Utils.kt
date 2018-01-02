@@ -1,5 +1,6 @@
 package picturedraweditor.inlacou.bvapps.com.picturedraweditor
 
+import android.content.res.Resources
 import android.util.Log
 import android.view.View
 
@@ -19,3 +20,10 @@ object Utils {
 		view.layoutParams = lp
 	}
 }
+
+//Extension functions
+val Int.toPx: Int
+	get() = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+val Int.toDp: Int
+	get() = (this / Resources.getSystem().displayMetrics.density).toInt()

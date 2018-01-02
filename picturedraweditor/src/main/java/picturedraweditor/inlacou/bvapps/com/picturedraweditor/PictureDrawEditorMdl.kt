@@ -8,10 +8,10 @@ import android.graphics.Color
  */
 data class PictureDrawEditorMdl(val filePath: String) {
 	var layer0: Bitmap? = null
-	var layer1: Bitmap? = null
-	var layer2: Bitmap? = null
 	var color: Int = Color.BLACK
 	var mode: Mode = Mode.draw
+	var eraserWidth: Int = 15
+	var colorWidth: Int = 15
 }
 enum class Mode {
 	pick, draw, erase

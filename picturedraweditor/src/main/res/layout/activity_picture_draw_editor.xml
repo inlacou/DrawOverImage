@@ -5,6 +5,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:animateLayoutChanges="true"
 	android:background="#000000">
 	<RelativeLayout
 		android:id="@+id/top"
@@ -34,63 +35,84 @@
 	</RelativeLayout>
 	<RelativeLayout
 		android:id="@+id/side"
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_below="@+id/top"
-		android:layout_alignParentRight="true"
 		android:layout_alignParentEnd="true">
 		<RelativeLayout
 			android:id="@+id/erase"
 			android:layout_width="32dp"
-			android:layout_height="32dp"
+			android:layout_height="wrap_content"
 			android:layout_margin="8dp"
-			android:background="#fff">
+			android:layout_alignParentEnd="true"
+			android:animateLayoutChanges="true"
+			android:background="@drawable/rectangle_rounded_white">
 			<ImageView
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:id="@+id/eraser_icon"
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:padding="@dimen/button_icon_padding"
 				android:src="@drawable/eraser"/>
+			<picturedraweditor.inlacou.bvapps.com.picturedraweditor.CircleView
+				android:id="@+id/eraser_display"
+				android:layout_width="match_parent"
+				android:layout_height="32dp"
+				android:layout_below="@id/eraser_icon"
+				app:circleRadius="14dp"
+				app:strokeWidth="2dp"
+				app:circleGap="1dp"
+				app:fillColor="@android:color/black"
+				app:strokeColor="#DDD"
+				android:src="@drawable/brush"/>
 		</RelativeLayout>
 		<RelativeLayout
 			android:id="@+id/undo"
-			android:layout_width="32dp"
-			android:layout_height="32dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentEnd="true"
 			android:layout_margin="8dp"
 			android:layout_below="@+id/erase"
-			android:background="#fff">
+			android:background="@drawable/rectangle_rounded_white">
 			<ImageView
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:padding="@dimen/button_icon_padding"
 				android:src="@drawable/undo"/>
 		</RelativeLayout>
 		<RelativeLayout
 			android:id="@+id/redo"
-			android:layout_width="32dp"
-			android:layout_height="32dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:layout_margin="8dp"
 			android:layout_below="@+id/undo"
-			android:background="#fff">
+			android:layout_alignParentEnd="true"
+			android:background="@drawable/rectangle_rounded_white">
 			<ImageView
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:padding="@dimen/button_icon_padding"
 				android:src="@drawable/redo"/>
 		</RelativeLayout>
 		<RelativeLayout
 			android:id="@+id/color"
 			android:layout_width="32dp"
-			android:layout_height="64dp"
+			android:layout_height="wrap_content"
 			android:layout_margin="8dp"
+			android:layout_alignParentEnd="true"
 			android:layout_alignParentBottom="true"
-			android:background="#fff">
+			android:animateLayoutChanges="true"
+			android:background="@drawable/rectangle_rounded_white">
 			<ImageView
-				android:id="@+id/brush_color_display"
-				android:layout_width="match_parent"
+				android:id="@+id/brush_color_icon"
+				android:layout_width="32dp"
 				android:layout_height="32dp"
+				android:padding="@dimen/button_icon_padding"
 				android:src="@drawable/brush"/>
 			<picturedraweditor.inlacou.bvapps.com.picturedraweditor.CircleView
 				android:id="@+id/color_display"
 				android:layout_width="match_parent"
 				android:layout_height="32dp"
-				android:layout_alignParentBottom="true"
+				android:layout_below="@+id/brush_color_icon"
 				app:circleRadius="14dp"
 				app:strokeWidth="2dp"
 				app:circleGap="1dp"
@@ -98,32 +120,50 @@
 				app:strokeColor="#DDD"
 				android:src="@drawable/brush"/>
 		</RelativeLayout>
-	</RelativeLayout>
-	<colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
-		android:id="@+id/colorPickLayout"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_below="@+id/top"
-		android:layout_toStartOf="@+id/side"
-		android:layout_alignParentStart="true"
-		android:layout_alignParentBottom="true">
-		<RelativeLayout
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_margin="8dp"
-			android:gravity="start|bottom">
-			<ImageView
-				android:id="@+id/image"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"/>
-			<picturedraweditor.inlacou.bvapps.com.picturedraweditor.CanvasView
-				android:id="@+id/canvas"
+		<colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
+			android:id="@+id/colorPickLayout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_toStartOf="@+id/erase"
+			android:layout_alignParentStart="true"
+			android:layout_alignParentBottom="true">
+			<RelativeLayout
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_alignTop="@+id/image"
-				android:layout_alignBottom="@+id/image"
-				android:layout_alignStart="@+id/image"
-				android:layout_alignEnd="@+id/image"/>
-		</RelativeLayout>
-	</colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout>
+				android:layout_margin="8dp"
+				android:gravity="start|bottom">
+				<ImageView
+					android:id="@+id/image"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"/>
+				<picturedraweditor.inlacou.bvapps.com.picturedraweditor.CanvasView
+					android:id="@+id/canvas"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignTop="@+id/image"
+					android:layout_alignBottom="@+id/image"
+					android:layout_alignStart="@+id/image"
+					android:layout_alignEnd="@+id/image"/>
+			</RelativeLayout>
+		</colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout>
+		<!-- Seekbar from 10 to 40-->
+		<SeekBar
+			android:id="@+id/seekbar_eraser"
+			android:layout_width="200dp"
+			android:layout_height="wrap_content"
+			android:max="30"
+			android:layout_marginTop="30dp"
+			android:layout_alignTop="@+id/erase"
+			android:layout_toStartOf="@+id/erase"
+			android:background="@drawable/rectangle_rounded_white_original"/>
+		<SeekBar
+			android:id="@+id/seekbar_color_brush"
+			android:layout_width="200dp"
+			android:layout_height="wrap_content"
+			android:max="30"
+			android:layout_marginTop="30dp"
+			android:layout_alignTop="@+id/color"
+			android:layout_toStartOf="@+id/color"
+			android:background="@drawable/rectangle_rounded_white_original"/>
+	</RelativeLayout>
 </RelativeLayout>

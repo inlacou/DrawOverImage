@@ -1,3 +1,4 @@
 <resources>
 	<string name="app_name">PictureDrawEditor</string>
+	<string name="Saving">Saving...</string>
 </resources>
