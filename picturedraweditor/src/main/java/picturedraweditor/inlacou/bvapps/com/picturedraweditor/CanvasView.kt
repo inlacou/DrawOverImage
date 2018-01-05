@@ -14,6 +14,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 
 import java.io.File
 import java.io.FileOutputStream
@@ -32,6 +33,10 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 	private var mX: Float = 0.toFloat()
 	private var mY: Float = 0.toFloat()
 	private var model: PictureDrawEditorMdl? = null
+
+	private var actionDownTime: Long = 0
+	var singleClickListener: SingleClickListener? = null
+	var singleClickThresholdLimit = 80
 
 	private val paths = ArrayList<Path>()
 	private val paints = ArrayList<Paint>()
@@ -134,6 +139,7 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	// when ACTION_DOWN start touch according to the x,y values
 	private fun startTouch(x: Float, y: Float) {
+		actionDownTime = System.currentTimeMillis()
 		currentPath.moveTo(x, y)
 		mX = x
 		mY = y
@@ -152,9 +158,12 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	// when ACTION_UP stop touch
 	private fun upTouch() {
+		if(System.currentTimeMillis()-actionDownTime<singleClickThresholdLimit) singleClickListener?.onSingleClick()
 		currentPath.lineTo(mX, mY)
-		paths.add(currentPath)
-		paints.add(currentPaint)
+		if(!currentPath.isEmpty) {
+			paths.add(currentPath)
+			paints.add(currentPaint)
+		}
 	}
 
 	fun clearCanvas() {
@@ -230,6 +239,10 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	interface FileSavedListener{
 		fun onFileSaved(file: File)
+	}
+
+	interface SingleClickListener{
+		fun onSingleClick()
 	}
 
 }

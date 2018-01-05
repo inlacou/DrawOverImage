@@ -16,9 +16,12 @@ import android.graphics.Point
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.SeekBar
+import android.widget.Toast
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorWrapper
@@ -37,6 +40,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	lateinit private var imageView: ImageView
 	lateinit private var colorPickLayout: ColorPickLayout
+	lateinit private var vUI: View
 	lateinit private var btnColor: View
 	lateinit private var btnUndo: View
 	lateinit private var btnRedo: View
@@ -70,7 +74,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 		this.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-		setContentView(R.layout.activity_picture_draw_editor)
+		setContentView(R.layout.activity_picture_draw_editor_2)
 
 		getIntentData()
 
@@ -88,6 +92,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	private fun initialize(savedInstanceState: Bundle?) {
 		imageView = findViewById(R.id.image)
 		colorPickLayout = findViewById(R.id.colorPickLayout)
+		vUI = findViewById(R.id.ui)
 		canvas = findViewById(R.id.canvas)
 		colorDisplay = findViewById(R.id.color_display)
 		eraserDisplay = findViewById(R.id.eraser_display)
@@ -107,6 +112,14 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	private fun populate() {
 		Log.d(DEBUG_TAG, "model: $model")
+
+		window.decorView.systemUiVisibility = (
+				//View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+				//or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+				//or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+				View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or // hide nav bar
+				View.SYSTEM_UI_FLAG_FULLSCREEN or // hide status bar
+				View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
 		colorDisplay.fillColor = model.color
 		eraserDisplay.visibility = View.GONE
@@ -153,6 +166,26 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 
 	private fun setListeners() {
+		colorPickLayout.singleClickThresholdLimit = 80
+		colorPickLayout.singleClickListener = object: ColorPickLayout.SingleClickListener{
+			override fun onSingleClick() {
+				if(vUI.visibility == View.VISIBLE){
+					vUI.visibility = View.GONE
+				}else{
+					vUI.visibility = View.VISIBLE
+				}
+			}
+		}
+		canvas.singleClickThresholdLimit = 80
+		canvas.singleClickListener = object: CanvasView.SingleClickListener{
+			override fun onSingleClick() {
+				if(vUI.visibility == View.VISIBLE){
+					vUI.visibility = View.GONE
+				}else{
+					vUI.visibility = View.VISIBLE
+				}
+			}
+		}
 		btnColor.setOnClickListener {
 			if(model.mode==Mode.draw){
 				model.mode = Mode.pick

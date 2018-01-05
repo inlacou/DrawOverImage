@@ -31,7 +31,7 @@ dependencies {
 	androidTestImplementation 'com.android.support.test:runner:1.0.1'
 	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-	compile 'com.github.inlacou:colorpicklayout:1.0.0'
+	compile 'com.github.inlacou:colorpicklayout:1.0.2'
 	compile 'com.mikhaellopez:circularimageview:3.0.2'
 	compile 'com.google.code.gson:gson:2.8.2'
 	compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
