@@ -92,8 +92,10 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	private fun updateBitmap(w: Int, h: Int) {
 		// your Canvas will draw onto the defined Bitmap
-		mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-		mCanvas = Canvas(mBitmap!!)
+		if(mBitmap==null) {
+			mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+			mCanvas = Canvas(mBitmap!!)
+		}
 	}
 
 	fun saveImage(listener: FileSavedListener) {
