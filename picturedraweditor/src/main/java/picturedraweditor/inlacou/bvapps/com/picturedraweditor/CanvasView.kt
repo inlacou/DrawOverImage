@@ -15,18 +15,20 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
+import java.io.*
 
-import java.io.File
-import java.io.FileOutputStream
+import java.nio.channels.FileChannel
 import java.util.ArrayList
 import kotlin.concurrent.thread
+import java.nio.channels.FileChannel.MapMode.READ_WRITE
+
+
 
 /**
  * Created by inlacou on 20/12/17.
  */
 class CanvasView(internal var context: Context, attrs: AttributeSet) : View(context, attrs) {
 
-	private var mBitmap: Bitmap? = null
 	private var mCanvas: Canvas? = null
 	private var currentPath: Path = Path()
 	private var currentPaint: Paint = Paint()
@@ -44,6 +46,7 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 	private val redoPaints = ArrayList<Paint>()
 
 	fun setModel(model: PictureDrawEditorMdl) {
+		Log.d(DEBUG_TAG, "setModel")
 		this.model = model
 	}
 
@@ -92,9 +95,10 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	private fun updateBitmap(w: Int, h: Int) {
 		// your Canvas will draw onto the defined Bitmap
-		if(mBitmap==null) {
-			mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-			mCanvas = Canvas(mBitmap!!)
+		if(mCanvas==null) {
+			mCanvas = Canvas(model!!.layer0!!)
+		}else{
+			Log.d(DEBUG_TAG + ".updateBitmap", "ignored")
 		}
 	}
 
@@ -116,7 +120,10 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 			if (file.exists()) file.delete()
 			try {
 				val out = FileOutputStream(file)
-				overlay(model!!.layer0, mBitmap).compress(Bitmap.CompressFormat.PNG, 90, out)
+				//val bm = overlay(model!!.layer0!!, mBitmap!!)
+				model!!.layer0!!.compress(Bitmap.CompressFormat.PNG, 90, out)
+				//bm.recycle()
+				model?.layer0?.recycle()
 				out.flush()
 				out.close()
 			} catch (e: Exception) {
@@ -222,20 +229,75 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 			return false
 	}
 
+	fun onDestroy(){
+		model?.layer0?.recycle()
+	}
+
 	companion object {
 
 		private val DEBUG_TAG = CanvasView::class.java.simpleName
 		private val TOLERANCE = 5f
 
-		fun overlay(bmp1: Bitmap?, bmp2: Bitmap?): Bitmap {
-			Log.d(DEBUG_TAG + ".overlay1", bmp1!!.width.toString() + ", " + bmp1.height)
-			Log.d(DEBUG_TAG + ".overlay2", bmp2!!.width.toString() + ", " + bmp2.height)
-			val bmOverlay = Bitmap.createBitmap(bmp1.width, bmp1.height, bmp1.config)
-			val scaledBmp2 = Bitmap.createScaledBitmap(bmp2, bmp1.width, bmp1.height, false)
+		@Deprecated("Just here for reference")
+		private fun overlay(bmp1: Bitmap, bmp2: Bitmap): Bitmap {
+			val w1 = bmp1.width
+			val h1 = bmp1.width
+			val bmOverlay = Bitmap.createBitmap(w1, h1, bmp1.config)
 			val canvas = Canvas(bmOverlay)
 			canvas.drawBitmap(bmp1, Matrix(), null)
+			bmp1.recycle()
+			val scaledBmp2 = Bitmap.createScaledBitmap(bmp2, w1, h1, false)
 			canvas.drawBitmap(scaledBmp2, 0f, 0f, null)
+			bmp2.recycle()
+			scaledBmp2.recycle()
 			return bmOverlay
+		}
+
+		fun convertToMutable(imgIn: Bitmap): Bitmap {
+			var imgIn = imgIn
+			try {
+				//this is the file going to use temporally to save the bytes.
+				// This file will not be a image, it will store the raw image data.
+				val file = File(Environment.getExternalStorageDirectory().toString() + File.separator + "temp.tmp")
+
+				//Open an RandomAccessFile
+				//Make sure you have added uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+				//into AndroidManifest.xml file
+				val randomAccessFile = RandomAccessFile(file, "rw")
+
+				// get the width and height of the source bitmap.
+				val width = imgIn.width
+				val height = imgIn.height
+				val type = imgIn.config
+
+				//Copy the byte to the file
+				//Assume source bitmap loaded using options.inPreferredConfig = Config.ARGB_8888;
+				val channel = randomAccessFile.channel
+				val map = channel.map(FileChannel.MapMode.READ_WRITE, 0, imgIn.rowBytes.toLong() * height.toLong())
+				imgIn.copyPixelsToBuffer(map)
+				//recycle the source bitmap, this will be no longer used.
+				imgIn.recycle()
+				System.gc()// try to force the bytes from the imgIn to be released
+
+				//Create a new bitmap to load the bitmap again. Probably the memory will be available.
+				imgIn = Bitmap.createBitmap(width, height, type)
+				map.position(0)
+				//load it back from temporary
+				imgIn.copyPixelsFromBuffer(map)
+				//close the temporary file and channel , then delete that also
+				channel.close()
+				randomAccessFile.close()
+
+				// delete the temp file
+				file.delete()
+
+			} catch (e: FileNotFoundException) {
+				e.printStackTrace()
+			} catch (e: IOException) {
+				e.printStackTrace()
+			}
+
+			return imgIn
 		}
 	}
 

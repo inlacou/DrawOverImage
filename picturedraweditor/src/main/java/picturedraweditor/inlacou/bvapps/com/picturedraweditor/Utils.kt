@@ -9,7 +9,6 @@ import android.view.View
  */
 object Utils {
 	fun resizeView(view: View, width: Int, height: Int) {
-		Log.d("Utils.resizeView", "size: $width, $height")
 		val lp = view.layoutParams
 		if (width > -1) {
 			lp.width = width

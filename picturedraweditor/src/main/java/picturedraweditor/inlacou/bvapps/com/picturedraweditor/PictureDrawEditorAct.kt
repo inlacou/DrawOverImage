@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
@@ -15,13 +16,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.SeekBar
-import android.widget.Toast
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorWrapper
@@ -111,8 +108,6 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 
 	private fun populate() {
-		Log.d(DEBUG_TAG, "model: $model")
-
 		window.decorView.systemUiVisibility = (
 				//View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
 				//or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
@@ -133,15 +128,10 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 		imageView.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener{
 			override fun onGlobalLayout() {
-				var size = Point()
+				val size = Point()
 				windowManager.defaultDisplay.getRealSize(size)
-				Log.d(DEBUG_TAG, "screen size: $size | proportion: ${size.x.toDouble()/size.y}")
-				Log.d(DEBUG_TAG, "image size: ${imageView.width}, ${imageView.height} | proportion: ${imageView.width.toDouble()/imageView.height}")
-				//Log.d(DEBUG_TAG, "new screen size: $size | proportion: ${size.x.toDouble()/size.y}")
-				//Log.d(DEBUG_TAG, "new image size: ${imageView.width}, ${imageView.width*size.y/size.x} | proportion: ${imageView.width.toDouble()/(imageView.width*size.y/size.x)}")
 
 				imageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-				//Utils.resizeView(imageView, -1, imageView.width*size.y/size.x)
 			}
 		})
 
@@ -156,13 +146,18 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			e.printStackTrace()
 		}
 
-		if (model.layer0 == null) {
-			return
+		model.layer0?.let {
+			val display = windowManager.defaultDisplay;
+			val size = Point()
+			display.getSize(size)
+			val width = size.x
+			val height = size.y
+			model.layer0 = CanvasView.convertToMutable(model.layer0!!)
+			model.layer0 = Bitmap.createScaledBitmap(model.layer0, width, height, false)
+			imageView.adjustViewBounds = true
+			imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+			imageView.setImageDrawable(BitmapDrawable(resources, model.layer0))
 		}
-		imageView.adjustViewBounds = true
-		imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-		val drawable = BitmapDrawable(resources, model.layer0)
-		imageView.setImageDrawable(drawable)
 	}
 
 	private fun setListeners() {
@@ -272,7 +267,6 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			progressDialog.setMessage(getString(R.string.Saving))
 			progressDialog.isIndeterminate = true
 			progressDialog.setOnShowListener {
-				Log.d(DEBUG_TAG, "onShow")
 				canvas.saveImage(object: CanvasView.FileSavedListener{
 					override fun onFileSaved(file: File) {
 						progressDialog.dismiss()
@@ -310,6 +304,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	override fun onDestroy() {
 		controller.onDestroy()
+		canvas.onDestroy()
 		super.onDestroy()
 	}
 

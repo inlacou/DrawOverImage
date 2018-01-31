@@ -96,16 +96,6 @@ public class CircleView
 		return p;
 	}
 
-	/*@Override
-	protected int hGetMaximumHeight() {
-		return circleRadius * 2 + strokeWidth;
-	}
-
-	@Override
-	protected int hGetMaximumWidth() {
-		return circleRadius * 2 + strokeWidth;
-	}*/
-
 	public int getCircleRadius() {
 		return circleRadius;
 	}

@@ -5,11 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import kotlinx.android.synthetic.main.activity_example.*
 import libraries.inlacou.com.imagegetter.ImageGetter
 import picturedraweditor.inlacou.bvapps.com.picturedraweditor.PictureDrawEditorAct
 import picturedraweditor.inlacou.bvapps.com.picturedraweditor.PictureDrawEditorMdl
-import java.io.File
 
 class ExampleActivity : AppCompatActivity() {
 
