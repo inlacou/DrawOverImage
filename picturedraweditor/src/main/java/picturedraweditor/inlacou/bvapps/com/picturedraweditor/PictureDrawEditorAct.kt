@@ -1,9 +1,7 @@
 package picturedraweditor.inlacou.bvapps.com.picturedraweditor
 
 import android.app.Activity
-import android.app.Dialog
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -19,6 +17,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.SeekBar
+import android.widget.Toast
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorWrapper
@@ -37,7 +36,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	lateinit private var imageView: ImageView
 	lateinit private var colorPickLayout: ColorPickLayout
-	lateinit private var vUI: View
+	lateinit var vUI: View
 	lateinit private var btnColor: View
 	lateinit private var btnUndo: View
 	lateinit private var btnRedo: View
@@ -71,7 +70,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 		this.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-		setContentView(R.layout.activity_picture_draw_editor_2)
+		setContentView(R.layout.activity_picture_draw_editor)
 
 		getIntentData()
 
@@ -164,26 +163,24 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		colorPickLayout.singleClickThresholdLimit = 80
 		colorPickLayout.singleClickListener = object: ColorPickLayout.SingleClickListener{
 			override fun onSingleClick() {
-				if(vUI.visibility == View.VISIBLE){
-					vUI.visibility = View.GONE
-				}else{
-					vUI.visibility = View.VISIBLE
-				}
+				controller.onSingleClick()
 			}
 		}
 		canvas.singleClickThresholdLimit = 80
 		canvas.singleClickListener = object: CanvasView.SingleClickListener{
 			override fun onSingleClick() {
-				if(vUI.visibility == View.VISIBLE){
-					vUI.visibility = View.GONE
-				}else{
-					vUI.visibility = View.VISIBLE
-				}
+				controller.onSingleClick()
+			}
+		}
+		canvas.touchStartedListener = object: CanvasView.TouchStartedListener{
+			override fun onTouchStarted() {
+				controller.onCanvasTouchStarted()
 			}
 		}
 		btnColor.setOnClickListener {
 			if(model.mode==Mode.draw){
 				model.mode = Mode.pick
+				Toast.makeText(this, "Arrastra el dedo por la imagen para seleccionar un color. ", Toast.LENGTH_LONG).show()
 				brushPickerIcon.setImageDrawable(resources.getDrawable(R.drawable.color_picker))
 			}else{
 				model.mode = Mode.draw
@@ -202,27 +199,19 @@ class PictureDrawEditorAct : AppCompatActivity() {
 				colorDisplay.visibility = View.VISIBLE
 			}else{
 				model.mode = Mode.erase
-				eraserDisplay.visibility = View.VISIBLE
 				colorDisplay.visibility = View.GONE
 				colorBrushSeekbar.visibility = View.GONE
+				eraserDisplay.visibility = View.VISIBLE
 			}
 			canvas.update()
 		}
 		eraserDisplay.setOnClickListener {
 			//show size picker
-			if(eraserSeekbar.visibility == View.VISIBLE) {
-				eraserSeekbar.visibility = View.GONE
-			}else{
-				eraserSeekbar.visibility = View.VISIBLE
-			}
+			controller.onEraserDisplayClick()
 		}
 		colorDisplay.setOnClickListener {
-			//show size picker
-			if(colorBrushSeekbar.visibility == View.VISIBLE) {
-				colorBrushSeekbar.visibility = View.GONE
-			}else{
-				colorBrushSeekbar.visibility = View.VISIBLE
-			}
+			//show size
+			controller.onBrushDisplayClick()
 		}
 		eraserSeekbar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
 			override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
@@ -259,8 +248,13 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		btnUndo.setOnClickListener {
 			canvas.undo()
 		}
-		btnRedo.setOnClickListener {
-			canvas.redo()
+		if(model.showForwardButton) {
+			btnRedo.setOnClickListener {
+				canvas.redo()
+			}
+			btnRedo.visibility = View.VISIBLE
+		}else{
+			btnRedo.visibility = View.GONE
 		}
 		btnAccept.setOnClickListener{
 			val progressDialog = ProgressDialog(this)
@@ -307,5 +301,37 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		canvas.onDestroy()
 		super.onDestroy()
 	}
-
+	
+	fun switchEraserSeekBarVisibility() {
+		if(eraserSeekbar.visibility == View.VISIBLE) {
+			hideEraserSeekBar()
+		}else{
+			showEraserSeekBar()
+		}
+	}
+	
+	fun showEraserSeekBar() {
+		eraserSeekbar.visibility = View.VISIBLE
+	}
+	
+	fun hideEraserSeekBar() {
+		eraserSeekbar.visibility = View.GONE
+	}
+	
+	fun switchBrushSeekBarVisibility() {
+		if(colorBrushSeekbar.visibility == View.VISIBLE) {
+			hideBrushSeekBar()
+		}else{
+			showBrushSeekBar()
+		}
+	}
+	
+	fun showBrushSeekBar() {
+		colorBrushSeekbar.visibility = View.VISIBLE
+	}
+	
+	fun hideBrushSeekBar() {
+		colorBrushSeekbar.visibility = View.GONE
+	}
+	
 }

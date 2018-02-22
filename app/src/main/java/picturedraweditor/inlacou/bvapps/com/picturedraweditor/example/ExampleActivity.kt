@@ -36,7 +36,7 @@ class ExampleActivity : AppCompatActivity() {
 				//Get image from path and do whatever you want with it.
 				//For example, load it into an imageView
 				Log.d("ExampleAct", "path: $path")
-				PictureDrawEditorAct.navigateForResult(this@ExampleActivity, REQUEST_CODE_EDIT, PictureDrawEditorMdl(path))
+				PictureDrawEditorAct.navigateForResult(this@ExampleActivity, REQUEST_CODE_EDIT, PictureDrawEditorMdl(path, true, true))
 			}
 		}
 	}

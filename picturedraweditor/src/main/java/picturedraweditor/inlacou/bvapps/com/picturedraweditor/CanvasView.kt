@@ -36,8 +36,11 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 	private var mY: Float = 0.toFloat()
 	private var model: PictureDrawEditorMdl? = null
 
-	private var actionDownTime: Long = 0
+	var touchStartedListener: TouchStartedListener? = null
 	var singleClickListener: SingleClickListener? = null
+	//Variable know the value that indicates a click was a single click, and not a longer click
+	private var actionDownTime: Long = 0
+	//Variable to hold time past since action_down started
 	var singleClickThresholdLimit = 80
 
 	private val paths = ArrayList<Path>()
@@ -148,6 +151,7 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	// when ACTION_DOWN start touch according to the x,y values
 	private fun startTouch(x: Float, y: Float) {
+		touchStartedListener?.onTouchStarted()
 		actionDownTime = System.currentTimeMillis()
 		currentPath.moveTo(x, y)
 		mX = x
@@ -307,6 +311,10 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
 	interface SingleClickListener{
 		fun onSingleClick()
+	}
+
+	interface TouchStartedListener{
+		fun onTouchStarted()
 	}
 
 }

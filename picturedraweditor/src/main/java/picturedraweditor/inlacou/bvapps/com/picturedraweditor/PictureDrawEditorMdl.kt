@@ -6,7 +6,7 @@ import android.graphics.Color
 /**
  * Created by inlacou on 19/12/17.
  */
-data class PictureDrawEditorMdl(val filePath: String) {
+data class PictureDrawEditorMdl(val filePath: String, val isUiHideable: Boolean = true, val showForwardButton: Boolean = true) {
 	var layer0: Bitmap? = null
 	var color: Int = Color.BLACK
 	var mode: Mode = Mode.draw
