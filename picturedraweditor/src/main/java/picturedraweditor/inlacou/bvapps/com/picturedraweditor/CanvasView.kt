@@ -27,7 +27,7 @@ import java.nio.channels.FileChannel.MapMode.READ_WRITE
 /**
  * Created by inlacou on 20/12/17.
  */
-class CanvasView(internal var context: Context, attrs: AttributeSet) : View(context, attrs) {
+class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
 	private var mCanvas: Canvas? = null
 	private var currentPath: Path = Path()

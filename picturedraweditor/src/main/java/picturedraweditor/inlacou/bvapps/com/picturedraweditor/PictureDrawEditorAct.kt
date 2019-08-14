@@ -82,7 +82,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 
 	private fun getIntentData() {
-		if (intent.hasExtra("model")) model = Gson().fromJson(intent.extras.getString("model"))
+		if (intent.hasExtra("model")) model = Gson().fromJson(intent!!.extras!!.getString("model")!!)
 	}
 
 	private fun initialize(savedInstanceState: Bundle?) {
@@ -152,7 +152,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			val width = size.x
 			val height = size.y
 			model.layer0 = CanvasView.convertToMutable(model.layer0!!)
-			model.layer0 = Bitmap.createScaledBitmap(model.layer0, width, height, false)
+			model.layer0 = Bitmap.createScaledBitmap(model.layer0!!, width, height, false)
 			imageView.adjustViewBounds = true
 			imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
 			imageView.setImageDrawable(BitmapDrawable(resources, model.layer0))
