@@ -11,7 +11,6 @@ import android.widget.ImageView
 import com.google.gson.Gson
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewTreeObserver
@@ -44,7 +43,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	private lateinit var btnErase: View
 	private lateinit var btnAccept: View
 	private lateinit var btnCancel: View
-	private lateinit var colorBrushSeekbar: SeekBar
+	private lateinit var sbBrushColor: SeekBar
+	private lateinit var sbBrushOpacity: SeekBar
 	private lateinit var eraserSeekbar: SeekBar
 	private lateinit var colorDisplay: CircleView
 	private lateinit var eraserDisplay: CircleView
@@ -94,7 +94,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		eraserDisplay = findViewById(R.id.eraser_display)
 		brushPickerIcon = findViewById(R.id.brush_color_icon)
 		eraserIcon = findViewById(R.id.brush_color_icon)
-		colorBrushSeekbar = findViewById(R.id.seekbar_color_brush)
+		sbBrushColor = findViewById(R.id.seekbar_brush_color)
+		sbBrushOpacity = findViewById(R.id.seekbar_brush_opacity)
 		eraserSeekbar = findViewById(R.id.seekbar_eraser)
 		btnColor = findViewById(R.id.color)
 		btnErase = findViewById(R.id.erase)
@@ -119,8 +120,9 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		eraserDisplay.visibility = View.GONE
 		colorDisplay.visibility = View.VISIBLE
 		eraserSeekbar.visibility = View.GONE
-		colorBrushSeekbar.visibility = View.GONE
-		colorBrushSeekbar.progress = 5
+		sbBrushColor.visibility = View.GONE
+		sbBrushColor.progress = 5
+		sbBrushOpacity.visibility = View.GONE
 		colorDisplay.circleRadius = 15.toPx*(5+10)/40
 		eraserSeekbar.progress = 5
 		eraserDisplay.circleRadius = 15.toPx*(5+10)/40
@@ -168,18 +170,18 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 	private fun setListeners() {
 		colorPickLayout.singleClickThresholdLimit = 80
-		colorPickLayout.singleClickListener = object: ColorPickLayout.SingleClickListener{
+		colorPickLayout.singleClickListener = object: ColorPickLayout.SingleClickListener {
 			override fun onSingleClick() {
 				controller.onSingleClick()
 			}
 		}
 		canvas.singleClickThresholdLimit = 80
-		canvas.singleClickListener = object: CanvasView.SingleClickListener{
+		canvas.singleClickListener = object: CanvasView.SingleClickListener {
 			override fun onSingleClick() {
 				controller.onSingleClick()
 			}
 		}
-		canvas.touchStartedListener = object: CanvasView.TouchStartedListener{
+		canvas.touchStartedListener = object: CanvasView.TouchStartedListener {
 			override fun onTouchStarted() {
 				controller.onCanvasTouchStarted()
 			}
@@ -207,7 +209,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			}else{
 				model.mode = Mode.erase
 				colorDisplay.visibility = View.GONE
-				colorBrushSeekbar.visibility = View.GONE
+				sbBrushColor.visibility = View.GONE
+				sbBrushOpacity.visibility = View.GONE
 				eraserDisplay.visibility = View.VISIBLE
 			}
 			canvas.update()
@@ -236,13 +239,26 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			override fun onStopTrackingTouch(p0: SeekBar?) {
 			}
 		})
-		colorBrushSeekbar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+		sbBrushColor.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
 			override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
 				//min: 3.toPx
 				//max: 15.toPx
 				//Seekbar goes from 10 to 40
 				colorDisplay.circleRadius = 15.toPx*(p1+10)/40
 				model.colorWidth = p1+10
+				canvas.update()
+			}
+
+			override fun onStartTrackingTouch(p0: SeekBar?) {
+			}
+
+			override fun onStopTrackingTouch(p0: SeekBar?) {
+			}
+		})
+		sbBrushOpacity.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+			override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+				model.alpha = p1
+				colorDisplay.colorAlpha = p1
 				canvas.update()
 			}
 
@@ -287,24 +303,15 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			override fun onColorSelected(envelope: ColorWrapper) {
 				if(model.mode==Mode.pick) {
 					model.color = envelope.color
+					Timber.d("onColorSelected 1: ${envelope.color}")
 					colorDisplay.fillColor = model.color
+					Timber.d("onColorSelected 2: ${colorDisplay.fillColor}")
 				}
 			}
 		})
 	}
 
-	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, data)
-		controller.onActivityResult(requestCode, resultCode, data)
-	}
-
-	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-		controller.onRequestPermissionsResult(requestCode, permissions, grantResults)
-	}
-
 	override fun onDestroy() {
-		controller.onDestroy()
 		canvas.onDestroy()
 		super.onDestroy()
 	}
@@ -325,20 +332,22 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		eraserSeekbar.visibility = View.GONE
 	}
 	
-	fun switchBrushSeekBarVisibility() {
-		if(colorBrushSeekbar.visibility == View.VISIBLE) {
-			hideBrushSeekBar()
-		}else{
+	fun switchBrushSeekBarsVisibility() {
+		if(sbBrushColor.visibility!=View.VISIBLE || sbBrushOpacity.visibility!=View.VISIBLE) {
 			showBrushSeekBar()
+		}else{
+			hideBrushSeekBar()
 		}
 	}
 	
 	fun showBrushSeekBar() {
-		colorBrushSeekbar.visibility = View.VISIBLE
+		sbBrushColor.visibility = View.VISIBLE
+		sbBrushOpacity.visibility = View.VISIBLE
 	}
 	
 	fun hideBrushSeekBar() {
-		colorBrushSeekbar.visibility = View.GONE
+		sbBrushColor.visibility = View.GONE
+		sbBrushOpacity.visibility = View.GONE
 	}
 	
 	override fun onBackPressed() {

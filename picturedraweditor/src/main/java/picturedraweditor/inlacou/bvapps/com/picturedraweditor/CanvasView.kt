@@ -11,17 +11,14 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.os.Environment
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import timber.log.Timber
 import java.io.*
 
 import java.nio.channels.FileChannel
 import java.util.ArrayList
 import kotlin.concurrent.thread
-import java.nio.channels.FileChannel.MapMode.READ_WRITE
 import kotlin.math.abs
 
 /**
@@ -66,27 +63,26 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 		// and we set a new Paint with the desired attributes
 		currentPaint = Paint()
 		currentPaint.isAntiAlias = true
-		if (model != null && model!!.mode === Mode.erase) {
-			currentPaint.color = Color.TRANSPARENT
-			currentPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-			currentPaint.strokeWidth = model!!.eraserWidth.toPx.toFloat()
-		} else {
-			currentPaint.strokeWidth = model?.colorWidth?.toPx?.toFloat() ?: 15.toPx.toFloat()
-			if (model != null) {
-				currentPaint.color = model!!.color
+		
+		model.let {
+			if(it!=null && it.mode==Mode.erase){
+				currentPaint.color = Color.TRANSPARENT
+				currentPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+				currentPaint.strokeWidth = it.eraserWidth.toPx.toFloat()
 			} else {
-				currentPaint.color = Color.BLACK
+				currentPaint.strokeWidth = it?.colorWidth?.toPx?.toFloat() ?: 15.toPx.toFloat()
+				currentPaint.color = it?.color ?: Color.BLACK
+				currentPaint.alpha = model?.alpha ?: 180
 			}
-			//Set alpha to 0.7
-			currentPaint.alpha = 180
 		}
+		
 		currentPaint.style = Paint.Style.STROKE
 		currentPaint.strokeJoin = Paint.Join.ROUND
 	}
 
 	init {
 		this.isDrawingCacheEnabled = true
-		setLayerType(View.LAYER_TYPE_HARDWARE, null)
+		setLayerType(LAYER_TYPE_HARDWARE, null)
 		update()
 	}
 
@@ -242,7 +238,6 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
 	companion object {
 
-		private val DEBUG_TAG = CanvasView::class.java.simpleName
 		private val TOLERANCE = 5f
 
 		@Deprecated("Just here for reference")

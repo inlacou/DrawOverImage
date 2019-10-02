@@ -1,6 +1,5 @@
 package picturedraweditor.inlacou.bvapps.com.picturedraweditor
 
-import android.content.Intent
 import android.view.View
 
 /**
@@ -8,29 +7,12 @@ import android.view.View
  */
 class PictureDrawEditorCtrl(val view: PictureDrawEditorAct, val model: PictureDrawEditorMdl) {
 
-	companion object {
-		private val DEBUG_TAG = PictureDrawEditorCtrl::class.java.simpleName
-	}
-
-	init { //initialize
-
-	}
-
-	fun onDestroy() {
-	}
-
-	fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-	}
-
-	fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-	}
-	
 	fun onEraserDisplayClick() {
 		view.switchEraserSeekBarVisibility()
 	}
 	
 	fun onBrushDisplayClick() {
-		view.switchBrushSeekBarVisibility()
+		view.switchBrushSeekBarsVisibility()
 	}
 	
 	fun onCanvasTouchStarted() {

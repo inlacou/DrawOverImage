@@ -19,6 +19,7 @@ public class CircleView
 	private int strokeWidth = 15;
 	private int fillColor = 0XFFFFAB00;
 	private int circleGap = 20;
+	private int colorAlpha = 180;
 
 	public CircleView(Context context) {
 		super(context);
@@ -79,8 +80,7 @@ public class CircleView
 		canvas.drawCircle(ox, oy, circleRadius - circleGap, getFill());
 	}
 
-	private Paint getStroke()
-	{
+	private Paint getStroke() {
 		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 		p.setStrokeWidth(strokeWidth);
 		p.setColor(strokeColor);
@@ -88,10 +88,10 @@ public class CircleView
 		return p;
 	}
 
-	private Paint getFill()
-	{
+	private Paint getFill() {
 		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 		p.setColor(fillColor);
+		p.setAlpha(colorAlpha);
 		p.setStyle(Paint.Style.FILL);
 		return p;
 	}
@@ -102,6 +102,10 @@ public class CircleView
 
 	public void setCircleRadius(int circleRadius) {
 		this.circleRadius = circleRadius;
+		invalidate();
+	}
+
+	public void update() {
 		invalidate();
 	}
 
@@ -129,6 +133,15 @@ public class CircleView
 
 	public void setFillColor(int fillColor) {
 		this.fillColor = fillColor;
+		invalidate();
+	}
+
+	public int getColorAlpha() {
+		return colorAlpha;
+	}
+
+	public void setColorAlpha(int colorAlpha) {
+		this.colorAlpha = colorAlpha;
 		invalidate();
 	}
 
