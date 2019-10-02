@@ -5,9 +5,8 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageView
-import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.BitmapFactory
@@ -31,28 +30,27 @@ import java.io.IOException
  */
 class PictureDrawEditorAct : AppCompatActivity() {
 
-	lateinit private var model: PictureDrawEditorMdl
-	lateinit private var controller: PictureDrawEditorCtrl
+	private lateinit var model: PictureDrawEditorMdl
+	private lateinit var controller: PictureDrawEditorCtrl
 
-	lateinit private var imageView: ImageView
-	lateinit private var colorPickLayout: ColorPickLayout
+	private lateinit var imageView: ImageView
+	private lateinit var colorPickLayout: ColorPickLayout
 	lateinit var vUI: View
-	lateinit private var btnColor: View
-	lateinit private var btnUndo: View
-	lateinit private var btnRedo: View
-	lateinit private var btnErase: View
-	lateinit private var btnAccept: View
-	lateinit private var btnCancel: View
-	lateinit private var colorBrushSeekbar: SeekBar
-	lateinit private var eraserSeekbar: SeekBar
-	lateinit private var colorDisplay: CircleView
-	lateinit private var eraserDisplay: CircleView
-	lateinit private var brushPickerIcon: ImageView
-	lateinit private var eraserIcon: ImageView
-	lateinit private var canvas: CanvasView
+	private lateinit var btnColor: View
+	private lateinit var btnUndo: View
+	private lateinit var btnRedo: View
+	private lateinit var btnErase: View
+	private lateinit var btnAccept: View
+	private lateinit var btnCancel: View
+	private lateinit var colorBrushSeekbar: SeekBar
+	private lateinit var eraserSeekbar: SeekBar
+	private lateinit var colorDisplay: CircleView
+	private lateinit var eraserDisplay: CircleView
+	private lateinit var brushPickerIcon: ImageView
+	private lateinit var eraserIcon: ImageView
+	private lateinit var canvas: CanvasView
 
 	companion object {
-
 		private val DEBUG_TAG = PictureDrawEditorAct::class.java.simpleName
 		val RESULT_FILE_ABSOLUTE_PATH = "result_file_absolute_path"
 
@@ -82,7 +80,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 
 	private fun getIntentData() {
-		if (intent.hasExtra("model")) model = Gson().fromJson(intent!!.extras!!.getString("model")!!)
+		if (intent.hasExtra("model")) model = Gson().fromJson(intent!!.extras!!.getString("model")!!, PictureDrawEditorMdl::class.java)
 	}
 
 	private fun initialize(savedInstanceState: Bundle?) {
@@ -135,25 +133,28 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		})
 
 		try {
+			//Load image 1
 			val inputStream = FileInputStream(model.filePath)
 			model.layer0 = BitmapFactory.decodeStream(inputStream)
 			//selectedImage = ImageUtils.scaleBitmapKeepAspectRatio(bitmap, size)
 			inputStream.close()
 		} catch (e: FileNotFoundException) {
+			//Load image fallback
+			
 			model.layer0 = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(model.filePath))
 		} catch (e: IOException) {
 			e.printStackTrace()
 		}
 
 		model.layer0?.let {
-			val display = windowManager.defaultDisplay;
+			val display = windowManager.defaultDisplay
 			val size = Point()
 			display.getSize(size)
 			val width = size.x
 			val height = size.y
 			model.layer0 = CanvasView.convertToMutable(model.layer0!!)
 			model.layer0 = Bitmap.createScaledBitmap(model.layer0!!, width, height, false)
-			imageView.adjustViewBounds = true
+			imageView.adjustViewBounds = false
 			imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
 			imageView.setImageDrawable(BitmapDrawable(resources, model.layer0))
 		}

@@ -1,7 +1,7 @@
 package picturedraweditor.inlacou.bvapps.com.picturedraweditor.example
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -27,7 +27,7 @@ class ExampleActivity : AppCompatActivity() {
 				request_code_select_picture = REQUEST_CODE_SELECT_PICTURE, request_code_crop = REQUEST_CODE_CROP,
 				callbacks = getImageGetterCallback())
 
-		findViewById<Button>(R.id.startButton).setOnClickListener({ imageGetter!!.start("") })
+		findViewById<Button>(R.id.startButton).setOnClickListener { imageGetter!!.start("") }
 	}
 
 	private fun getImageGetterCallback(): ImageGetter.Callbacks {

@@ -21,7 +21,7 @@ import java.nio.channels.FileChannel
 import java.util.ArrayList
 import kotlin.concurrent.thread
 import java.nio.channels.FileChannel.MapMode.READ_WRITE
-
+import kotlin.math.abs
 
 
 /**
@@ -90,8 +90,8 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 	// override onSizeChanged
 	override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
 		super.onSizeChanged(w, h, oldw, oldh)
-		Log.d(DEBUG_TAG + ".onSizeChanged", "size:   $w, $h")
-		Log.d(DEBUG_TAG + ".onSizeChanged", "layer0: " + model!!.layer0!!.width + ", " + model!!.layer0!!.height)
+		Log.d("$DEBUG_TAG.onSizeChanged", "size:   $w, $h")
+		Log.d("$DEBUG_TAG.onSizeChanged", "layer0: " + model!!.layer0!!.width + ", " + model!!.layer0!!.height)
 
 		updateBitmap(w, h)
 	}
@@ -101,12 +101,12 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 		if(mCanvas==null) {
 			mCanvas = Canvas(model!!.layer0!!)
 		}else{
-			Log.d(DEBUG_TAG + ".updateBitmap", "ignored")
+			Log.d("$DEBUG_TAG.updateBitmap", "ignored")
 		}
 	}
 
 	fun saveImage(listener: FileSavedListener) {
-		Log.d(DEBUG_TAG+".saveImage", "start!")
+		Log.d("$DEBUG_TAG.saveImage", "start!")
 		//Draw background into the canvas
 		//mCanvas.drawBitmap(model.getLayer0(), 0, 0, null);
 		for (i in paths.indices) {
@@ -160,8 +160,8 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
 	// when ACTION_MOVE move touch according to the x,y values
 	private fun moveTouch(x: Float, y: Float) {
-		val dx = Math.abs(x - mX)
-		val dy = Math.abs(y - mY)
+		val dx = abs(x - mX)
+		val dy = abs(y - mY)
 		if (dx >= TOLERANCE || dy >= TOLERANCE) {
 			currentPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2)
 			mX = x
@@ -258,7 +258,7 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 		}
 
 		fun convertToMutable(imgIn: Bitmap): Bitmap {
-			var imgIn = imgIn
+			var img = imgIn
 			try {
 				//this is the file going to use temporally to save the bytes.
 				// This file will not be a image, it will store the raw image data.
@@ -270,24 +270,24 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 				val randomAccessFile = RandomAccessFile(file, "rw")
 
 				// get the width and height of the source bitmap.
-				val width = imgIn.width
-				val height = imgIn.height
-				val type = imgIn.config
+				val width = img.width
+				val height = img.height
+				val type = img.config
 
 				//Copy the byte to the file
 				//Assume source bitmap loaded using options.inPreferredConfig = Config.ARGB_8888;
 				val channel = randomAccessFile.channel
 				val map = channel.map(FileChannel.MapMode.READ_WRITE, 0, imgIn.rowBytes.toLong() * height.toLong())
-				imgIn.copyPixelsToBuffer(map)
+				img.copyPixelsToBuffer(map)
 				//recycle the source bitmap, this will be no longer used.
-				imgIn.recycle()
+				img.recycle()
 				System.gc()// try to force the bytes from the imgIn to be released
 
 				//Create a new bitmap to load the bitmap again. Probably the memory will be available.
-				imgIn = Bitmap.createBitmap(width, height, type)
+				img = Bitmap.createBitmap(width, height, type)
 				map.position(0)
 				//load it back from temporary
-				imgIn.copyPixelsFromBuffer(map)
+				img.copyPixelsFromBuffer(map)
 				//close the temporary file and channel , then delete that also
 				channel.close()
 				randomAccessFile.close()
@@ -301,7 +301,7 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 				e.printStackTrace()
 			}
 
-			return imgIn
+			return img
 		}
 	}
 
