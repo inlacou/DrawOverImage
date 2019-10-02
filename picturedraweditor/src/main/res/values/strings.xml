@@ -4,4 +4,6 @@
 	<string name="Exit">Exit</string>
 	<string name="Keep_here">Keep here</string>
 	<string name="Has_changes_would_you_like_to_exit">Item has changes. Do you want to exit anyway?</string>
+	<string name="Size">Size</string>
+	<string name="Opacity">Opacity</string>
 </resources>

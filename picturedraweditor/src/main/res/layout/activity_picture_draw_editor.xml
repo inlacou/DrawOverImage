@@ -77,7 +77,7 @@
 			android:layout_below="@+id/top"
 			android:layout_alignParentEnd="true"
 			android:animateLayoutChanges="true"
-			android:background="@drawable/rectangle_rounded_white">
+			android:background="@drawable/rectangle_rounded_white_ripple">
 			<ImageView
 				android:id="@+id/eraser_icon"
 				android:layout_width="32dp"
@@ -104,7 +104,7 @@
 			android:layout_below="@+id/erase"
 			android:layout_alignParentEnd="true"
 			android:animateLayoutChanges="true"
-			android:background="@drawable/rectangle_rounded_white">
+			android:background="@drawable/rectangle_rounded_white_ripple">
 			<ImageView
 				android:id="@+id/brush_color_icon"
 				android:layout_width="32dp"
@@ -130,7 +130,7 @@
 			android:layout_alignParentEnd="true"
 			android:layout_margin="8dp"
 			android:layout_alignParentBottom="true"
-			android:background="@drawable/rectangle_rounded_white">
+			android:background="@drawable/rectangle_rounded_white_ripple">
 			<ImageView
 				android:layout_width="32dp"
 				android:layout_height="32dp"
@@ -144,7 +144,7 @@
 			android:layout_margin="8dp"
 			android:layout_above="@+id/undo"
 			android:layout_alignParentEnd="true"
-			android:background="@drawable/rectangle_rounded_white">
+			android:background="@drawable/rectangle_rounded_white_ripple">
 			<ImageView
 				android:layout_width="32dp"
 				android:layout_height="32dp"
@@ -160,25 +160,50 @@
 			android:layout_marginTop="30dp"
 			android:layout_alignTop="@+id/erase"
 			android:layout_toStartOf="@+id/erase"
-			android:background="@drawable/rectangle_rounded_white_original"/>
-		<SeekBar
-			android:id="@+id/seekbar_brush_color"
-			android:layout_width="200dp"
+			android:background="@drawable/rectangle_rounded_white_ripple_original"/>
+		<LinearLayout
+			android:id="@+id/layout_brush"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:max="30"
-			android:layout_marginTop="40dp"
-			android:layout_alignTop="@+id/color"
-			android:layout_toStartOf="@+id/color"
-			android:background="@drawable/rectangle_rounded_white_original"/>
-		<SeekBar
-			android:id="@+id/seekbar_brush_opacity"
-			android:layout_width="200dp"
-			android:layout_height="wrap_content"
-			android:max="255"
-			android:progress="180"
 			android:layout_marginTop="5dp"
 			android:layout_alignTop="@+id/color"
 			android:layout_toStartOf="@+id/color"
-			android:background="@drawable/rectangle_rounded_white_original"/>
+			android:padding="8dp"
+			android:clickable="true"
+			android:background="@drawable/rectangle_rounded_white"
+			android:orientation="vertical">
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingStart="8dp"
+				android:paddingLeft="8dp"
+				android:paddingEnd="8dp"
+				android:paddingRight="8dp"
+				android:text="@string/Opacity"/>
+			<SeekBar
+				android:id="@+id/seekbar_brush_opacity"
+				android:layout_width="200dp"
+				android:layout_height="wrap_content"
+				android:padding="8dp"
+				android:max="255"
+				android:progress="180"
+				android:background="@drawable/rectangle_rounded_white_ripple_original"/>
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingTop="8dp"
+				android:paddingStart="8dp"
+				android:paddingLeft="8dp"
+				android:paddingEnd="8dp"
+				android:paddingRight="8dp"
+				android:text="@string/Size"/>
+			<SeekBar
+				android:id="@+id/seekbar_brush_size"
+				android:layout_width="200dp"
+				android:layout_height="wrap_content"
+				android:padding="8dp"
+				android:max="30"
+				android:background="@drawable/rectangle_rounded_white_ripple_original"/>
+		</LinearLayout>
 	</RelativeLayout>
 </RelativeLayout>

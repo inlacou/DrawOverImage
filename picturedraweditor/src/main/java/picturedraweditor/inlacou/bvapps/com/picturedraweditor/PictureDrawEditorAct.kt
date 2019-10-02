@@ -43,6 +43,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	private lateinit var btnErase: View
 	private lateinit var btnAccept: View
 	private lateinit var btnCancel: View
+	private lateinit var lBrush: View
 	private lateinit var sbBrushColor: SeekBar
 	private lateinit var sbBrushOpacity: SeekBar
 	private lateinit var eraserSeekbar: SeekBar
@@ -53,7 +54,6 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	private lateinit var canvas: CanvasView
 
 	companion object {
-		private val DEBUG_TAG = PictureDrawEditorAct::class.java.simpleName
 		val RESULT_FILE_ABSOLUTE_PATH = "result_file_absolute_path"
 
 		fun navigateForResult(activity: AppCompatActivity, requestCode: Int, mdl: PictureDrawEditorMdl) {
@@ -94,7 +94,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		eraserDisplay = findViewById(R.id.eraser_display)
 		brushPickerIcon = findViewById(R.id.brush_color_icon)
 		eraserIcon = findViewById(R.id.brush_color_icon)
-		sbBrushColor = findViewById(R.id.seekbar_brush_color)
+		lBrush = findViewById(R.id.layout_brush)
+		sbBrushColor = findViewById(R.id.seekbar_brush_size)
 		sbBrushOpacity = findViewById(R.id.seekbar_brush_opacity)
 		eraserSeekbar = findViewById(R.id.seekbar_eraser)
 		btnColor = findViewById(R.id.color)
@@ -120,9 +121,8 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		eraserDisplay.visibility = View.GONE
 		colorDisplay.visibility = View.VISIBLE
 		eraserSeekbar.visibility = View.GONE
-		sbBrushColor.visibility = View.GONE
+		lBrush.visibility = View.GONE
 		sbBrushColor.progress = 5
-		sbBrushOpacity.visibility = View.GONE
 		colorDisplay.circleRadius = 15.toPx*(5+10)/40
 		eraserSeekbar.progress = 5
 		eraserDisplay.circleRadius = 15.toPx*(5+10)/40
@@ -209,8 +209,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			}else{
 				model.mode = Mode.erase
 				colorDisplay.visibility = View.GONE
-				sbBrushColor.visibility = View.GONE
-				sbBrushOpacity.visibility = View.GONE
+				lBrush.visibility = View.GONE
 				eraserDisplay.visibility = View.VISIBLE
 			}
 			canvas.update()
@@ -333,7 +332,7 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 	
 	fun switchBrushSeekBarsVisibility() {
-		if(sbBrushColor.visibility!=View.VISIBLE || sbBrushOpacity.visibility!=View.VISIBLE) {
+		if(lBrush.visibility!=View.VISIBLE) {
 			showBrushSeekBar()
 		}else{
 			hideBrushSeekBar()
@@ -341,13 +340,11 @@ class PictureDrawEditorAct : AppCompatActivity() {
 	}
 	
 	fun showBrushSeekBar() {
-		sbBrushColor.visibility = View.VISIBLE
-		sbBrushOpacity.visibility = View.VISIBLE
+		lBrush.visibility = View.VISIBLE
 	}
 	
 	fun hideBrushSeekBar() {
-		sbBrushColor.visibility = View.GONE
-		sbBrushOpacity.visibility = View.GONE
+		lBrush.visibility = View.GONE
 	}
 	
 	override fun onBackPressed() {
