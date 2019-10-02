@@ -12,6 +12,7 @@
 		tools:replace="android:allowBackup"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
+		android:name=".AppCtrl"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
@@ -28,6 +29,15 @@
 			android:name="picturedraweditor.inlacou.bvapps.com.picturedraweditor.PictureDrawEditorAct"
 			android:theme="@style/AppTheme.NoActionBar"
 			/> <!--TODO add this to readme instructions-->
+		<provider
+			android:name="libraries.inlacou.com.imagegetter.GenericFileProvider"
+			android:authorities="${applicationId}.provider"
+			android:exported="false"
+			android:grantUriPermissions="true">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/provider_paths"/>
+		</provider>
 	</application>
 
 </manifest>

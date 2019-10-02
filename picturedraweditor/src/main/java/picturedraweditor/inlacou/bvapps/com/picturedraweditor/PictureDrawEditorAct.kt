@@ -2,24 +2,26 @@ package picturedraweditor.inlacou.bvapps.com.picturedraweditor
 
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.*
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageView
 import com.google.gson.Gson
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.BitmapFactory
-import android.graphics.Point
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorListener
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorWrapper
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -134,15 +136,17 @@ class PictureDrawEditorAct : AppCompatActivity() {
 
 		try {
 			//Load image 1
+			Timber.d("Load image: ${model.filePath}")
 			val inputStream = FileInputStream(model.filePath)
 			model.layer0 = BitmapFactory.decodeStream(inputStream)
 			//selectedImage = ImageUtils.scaleBitmapKeepAspectRatio(bitmap, size)
 			inputStream.close()
 		} catch (e: FileNotFoundException) {
 			//Load image fallback
-			
+			Timber.d("Load image fallback: ${model.filePath}")
 			model.layer0 = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(model.filePath))
 		} catch (e: IOException) {
+			Timber.d("Load image failed")
 			e.printStackTrace()
 		}
 
@@ -153,12 +157,14 @@ class PictureDrawEditorAct : AppCompatActivity() {
 			val width = size.x
 			val height = size.y
 			model.layer0 = CanvasView.convertToMutable(model.layer0!!)
-			model.layer0 = Bitmap.createScaledBitmap(model.layer0!!, width, height, false)
+			model.layer0 = model.layer0!!.scaleKeepAspectRatio(width, height)
 			imageView.adjustViewBounds = false
 			imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
 			imageView.setImageDrawable(BitmapDrawable(resources, model.layer0))
 		}
 	}
+	
+	
 
 	private fun setListeners() {
 		colorPickLayout.singleClickThresholdLimit = 80
@@ -335,4 +341,15 @@ class PictureDrawEditorAct : AppCompatActivity() {
 		colorBrushSeekbar.visibility = View.GONE
 	}
 	
+	override fun onBackPressed() {
+		if(canvas.hasSomething){
+			AlertDialog.Builder(this)
+					.setMessage(R.string.Has_changes_would_you_like_to_exit)
+					.setPositiveButton(R.string.Exit) { dialogInterface: DialogInterface, i: Int -> super.onBackPressed() }
+					.setNegativeButton(R.string.Keep_here) { dialogInterface: DialogInterface, i: Int -> dialogInterface.cancel() }
+					.show()
+		}else{
+			super.onBackPressed()
+		}
+	}
 }

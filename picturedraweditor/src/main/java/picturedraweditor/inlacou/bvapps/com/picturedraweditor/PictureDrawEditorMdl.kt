@@ -6,13 +6,17 @@ import android.graphics.Color
 /**
  * Created by inlacou on 19/12/17.
  */
-data class PictureDrawEditorMdl(val filePath: String, val isUiHideable: Boolean = true, val showForwardButton: Boolean = true) {
+data class PictureDrawEditorMdl(
+		val filePath: String,
+		val isUiHideable: Boolean = true,
+		val showForwardButton: Boolean = true) {
 	var layer0: Bitmap? = null
 	var color: Int = Color.BLACK
 	var mode: Mode = Mode.draw
 	var eraserWidth: Int = 15
 	var colorWidth: Int = 15
 }
+
 enum class Mode {
 	pick, draw, erase
 }

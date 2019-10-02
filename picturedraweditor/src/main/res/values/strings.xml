@@ -1,4 +1,7 @@
 <resources>
 	<string name="app_name">PictureDrawEditor</string>
 	<string name="Saving">Saving...</string>
+	<string name="Exit">Exit</string>
+	<string name="Keep_here">Keep here</string>
+	<string name="Has_changes_would_you_like_to_exit">Item has changes. Do you want to exit anyway?</string>
 </resources>

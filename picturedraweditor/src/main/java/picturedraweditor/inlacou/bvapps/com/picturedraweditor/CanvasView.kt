@@ -48,6 +48,8 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 	private val redoPaths = ArrayList<Path>()
 	private val redoPaints = ArrayList<Paint>()
 
+	val hasSomething get() = paints.isNotEmpty() && paths.isNotEmpty()
+	
 	fun setModel(model: PictureDrawEditorMdl) {
 		Log.d(DEBUG_TAG, "setModel")
 		this.model = model
