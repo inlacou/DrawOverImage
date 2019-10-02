@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import colorpickerlayout.inlacou.bvapps.com.colorpicklayout.ColorPickLayout
+import timber.log.Timber
 import java.io.*
 
 import java.nio.channels.FileChannel
@@ -23,9 +24,9 @@ import kotlin.concurrent.thread
 import java.nio.channels.FileChannel.MapMode.READ_WRITE
 import kotlin.math.abs
 
-
 /**
  * Created by inlacou on 20/12/17.
+ * Last updated by inlacou on 2/10/19.
  */
 class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
@@ -51,7 +52,7 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 	val hasSomething get() = paints.isNotEmpty() && paths.isNotEmpty()
 	
 	fun setModel(model: PictureDrawEditorMdl) {
-		Log.d(DEBUG_TAG, "setModel")
+		Timber.d("setModel")
 		this.model = model
 	}
 
@@ -92,8 +93,8 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 	// override onSizeChanged
 	override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
 		super.onSizeChanged(w, h, oldw, oldh)
-		Log.d("$DEBUG_TAG.onSizeChanged", "size:   $w, $h")
-		Log.d("$DEBUG_TAG.onSizeChanged", "layer0: " + model!!.layer0!!.width + ", " + model!!.layer0!!.height)
+		Timber.d("onSizeChanged | size:   $w, $h")
+		Timber.d("onSizeChanged | layer0: ${model!!.layer0!!.width}, ${model!!.layer0!!.height}")
 
 		updateBitmap(w, h)
 	}
@@ -103,12 +104,12 @@ class CanvasView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 		if(mCanvas==null) {
 			mCanvas = Canvas(model!!.layer0!!)
 		}else{
-			Log.d("$DEBUG_TAG.updateBitmap", "ignored")
+			Timber.d("updateBitmap | ignored")
 		}
 	}
 
 	fun saveImage(listener: FileSavedListener) {
-		Log.d("$DEBUG_TAG.saveImage", "start!")
+		Timber.d("saveImage | start!")
 		//Draw background into the canvas
 		//mCanvas.drawBitmap(model.getLayer0(), 0, 0, null);
 		for (i in paths.indices) {

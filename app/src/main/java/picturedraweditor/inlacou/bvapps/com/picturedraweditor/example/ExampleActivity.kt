@@ -8,6 +8,7 @@ import android.widget.Button
 import libraries.inlacou.com.imagegetter.ImageGetter
 import picturedraweditor.inlacou.bvapps.com.picturedraweditor.PictureDrawEditorAct
 import picturedraweditor.inlacou.bvapps.com.picturedraweditor.PictureDrawEditorMdl
+import timber.log.Timber
 
 class ExampleActivity : AppCompatActivity() {
 
@@ -35,7 +36,7 @@ class ExampleActivity : AppCompatActivity() {
 			override fun setImage(path: String, tag: String?) {
 				//Get image from path and do whatever you want with it.
 				//For example, load it into an imageView
-				Log.d("ExampleAct", "path: $path")
+				Timber.d("path: $path")
 				PictureDrawEditorAct.navigateForResult(this@ExampleActivity, REQUEST_CODE_EDIT, PictureDrawEditorMdl(path, true, true))
 			}
 		}
