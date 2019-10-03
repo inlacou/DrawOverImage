@@ -1,5 +1,6 @@
 package picturedraweditor.inlacou.bvapps.com.picturedraweditor.example
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -37,7 +38,7 @@ class ExampleActivity : AppCompatActivity() {
 				//Get image from path and do whatever you want with it.
 				//For example, load it into an imageView
 				Timber.d("path: $path")
-				PictureDrawEditorAct.navigateForResult(this@ExampleActivity, REQUEST_CODE_EDIT, PictureDrawEditorMdl(path, true, true))
+				PictureDrawEditorAct.navigateForResult(this@ExampleActivity, REQUEST_CODE_EDIT, PictureDrawEditorMdl(path, isUiHideable = true, showForwardButton = true))
 			}
 		}
 	}
@@ -51,6 +52,9 @@ class ExampleActivity : AppCompatActivity() {
 	protected override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
 		imageGetter?.onActivityResult(requestCode, resultCode, data)
+		if(requestCode==REQUEST_CODE_EDIT && resultCode==Activity.RESULT_OK && data!=null && data.hasExtra(PictureDrawEditorAct.RESULT_FILE_ABSOLUTE_PATH)){
+			val path = data.getStringExtra(PictureDrawEditorAct.RESULT_FILE_ABSOLUTE_PATH)
+		}
 	}
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
